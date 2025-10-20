@@ -1,4 +1,5 @@
 from langchain_core.documents import Document
+from langchain_community.document_loaders import PyPDFLoader
 
 documents = [
     Document(
@@ -10,3 +11,9 @@ documents = [
         metadata={"source": "Batman-End-of-Masks"}
     )
 ]
+
+file_path = "./example_data/nke-10k-2023.pdf"
+loader = PyPDFLoader(file_path)
+docs = loader.load()
+
+print(len(docs))
