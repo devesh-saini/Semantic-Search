@@ -1,23 +1,20 @@
-import asyncio
+#import asyncio
 #from langchain_core.documents import Document
 import chromadb
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
-from langchain_core.vectorstores import InMemoryVectorStore
+#from langchain_core.vectorstores import InMemoryVectorStore
 
 
 ####
 ## Loading PDF.
 ####
 
-file_path = "./example_data/nke-10k-2023.pdf"
+file_path = "./example_data/docker_cheatsheet.pdf"
 loader = PyPDFLoader(file_path)
 docs = loader.load()
-
-#print(len(docs))
-
 
 
 ####
@@ -56,6 +53,29 @@ print(f"Generated vectors of length: {len(vector2)}")
 ####
 
 chroma_client = chromadb.Client()
-collection = chroma_client.create_collection("Nike")
+if "Docker" not in [c.name for c in chroma_client.list_collections()]:
+    collection = chroma_client.create_collection("Docker")
+else:
+    collection = chroma_client.get_collection("Docker")
 
-print(chroma_client.list_collections())
+vector_store = Chroma(
+    collection_name="Docker",
+    embedding_function=embeddings,
+    persist_directory="./docker_langchain_vector_db"
+)
+
+
+####
+## Adding Docs to "Nike" collection.
+####
+
+#ids = vector_store.add_documents(all_splits)
+
+userQuery = input("=> ")
+print("-------------------")
+results = vector_store.similarity_search(
+            userQuery
+        )
+
+print(results[0])
+print("-------------------")
